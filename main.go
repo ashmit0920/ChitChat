@@ -14,6 +14,7 @@ var (
 		"templates/navbar.html",
 		"templates/login.html",
 		"templates/signup.html",
+		"templates/home.html",
 	))
 	users      = make(map[string]string)
 	usersMutex sync.Mutex
@@ -27,6 +28,7 @@ func main() {
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/auth", authHandler)
 	http.HandleFunc("/register", registerHandler)
+	http.HandleFunc("/home", homeHandler)
 
 	loadUsers()
 
@@ -89,11 +91,16 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 	usersMutex.Unlock()
 
 	if !ok || storedPassword != password {
-		http.Redirect(w, r, "/", http.StatusUnauthorized)
+		data := struct {
+			Error string
+		}{
+			Error: "Invalid credentials!",
+		}
+		templates.ExecuteTemplate(w, "login.html", data)
 		return
 	}
 
-	http.Redirect(w, r, "/chat", http.StatusSeeOther)
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
@@ -112,4 +119,8 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	saveUsers()
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	templates.ExecuteTemplate(w, "home.html", nil)
 }

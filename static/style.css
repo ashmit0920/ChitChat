@@ -85,13 +85,109 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-    background-color: #012638;
+    background-color: #012368;
 }
 
 /* Heading Styles */
 h2 {
     color: #333;
     text-align: center;
+}
+
+/* Error Message */
+.error {
+    color: red;
+    margin-top: 1rem;
+}
+
+/* Home Page Container */
+.container {
+    display: flex;
+    width: 80%;
+    margin: 2rem auto;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Split Screen Styles */
+.split {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.split.left {
+    border-right: 2px solid #e0e0e0;
+}
+
+.split.right {
+    border-left: 2px solid #e0e0e0;
+}
+
+/* Headings */
+h1 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+/* Paragraph */
+p {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+/* Buttons */
+button {
+    padding: 0.75rem 1.5rem;
+    background-color: #03aac2;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #012368;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .split.left, .split.right {
+        border: none;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .split.right {
+        border-top: none;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    p {
+        font-size: 0.875rem;
+    }
+
+    button {
+        width: 100%;
+    }
 }
 
 /* Responsive Design */
@@ -112,4 +208,4 @@ h2 {
     input[type="submit"] {
         width: 100%;
     }
-}
+}   
