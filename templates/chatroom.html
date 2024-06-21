@@ -5,6 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatroom - ChitChat</title>
     <link rel="stylesheet" href="/static/style.css">
+    <script>
+        // AJAX for sending messages
+        function sendMessage(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch('/sendmessage', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.text())
+            .then(html => {
+                const chatWindow = document.querySelector('.chat-window');
+                chatWindow.innerHTML = html;
+                form.message.value = '';
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatWindow = document.querySelector('.chat-window');
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        });
+
+    </script>
 </head>
 <body>
     <div class="chat-container">
@@ -12,10 +39,12 @@
             <h2 style="color: #fff;">Chatroom Code: {{.RoomCode}}</h2>
         </div>
         <div class="chat-window" id="chat-window">
-            <!-- Messages will be appended here -->
+            {{range .Messages}}
+            <div class="chat-message">{{.}}</div>
+            {{end}}
         </div>
         <div class="chat-input">
-            <form action="/sendmessage" method="post">
+            <form onsubmit="sendMessage(event)">
                 <input type="hidden" name="roomCode" value="{{.RoomCode}}">
                 <input type="hidden" name="username" value="{{.Username}}">
                 <input type="text" name="message" placeholder="Type your message..." required>

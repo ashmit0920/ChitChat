@@ -212,19 +212,26 @@ func chatRoomHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	username := cookie.Value
 
+	roomsMutex.Lock()
+	messages := chatrooms[roomCode]
+	roomsMutex.Unlock()
+
 	data := struct {
 		RoomCode string
 		Username string
+		Messages []string
 	}{
 		RoomCode: roomCode,
 		Username: username,
+		Messages: messages,
 	}
+
 	templates.ExecuteTemplate(w, "chatroom.html", data)
 }
 
 func sendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
@@ -233,8 +240,19 @@ func sendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	message := r.FormValue("message")
 
 	roomsMutex.Lock()
-	chatrooms[roomCode] = append(chatrooms[roomCode], fmt.Sprintf("%s: %s", username, message))
+	messages, ok := chatrooms[roomCode]
+	if !ok {
+		roomsMutex.Unlock()
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
+
+	fullMessage := fmt.Sprintf("%s: %s", username, message)
+	chatrooms[roomCode] = append(messages, fullMessage)
 	roomsMutex.Unlock()
 
-	http.Redirect(w, r, fmt.Sprintf("/chatroom?room=%s", roomCode), http.StatusSeeOther)
+	// Send only the chat messages as HTML
+	for _, msg := range chatrooms[roomCode] {
+		fmt.Fprintf(w, "<div class='chat-message'>%s</div>", msg)
+	}
 }

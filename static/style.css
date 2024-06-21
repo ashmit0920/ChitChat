@@ -206,6 +206,7 @@ button {
     border: 1px solid #e0e0e0;
     border-radius: 4px;
     margin-right: 1rem;
+    margin-bottom: 0.5rem;
     font-size: 1rem;
 }
 
@@ -223,6 +224,14 @@ button {
 .chat-input button:hover {
     background-color: #012368;
     transform: scale(1.05);
+}
+
+/* Chat Message */
+.chat-message {
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.75rem;
+    background-color: #f1f1f1;
+    border-radius: 5px;
 }
 
 /* Responsive Design */
@@ -255,7 +264,6 @@ button {
     }
 }
 
-/* Responsive Design */
 @media (max-width: 600px) {
     nav {
         flex-direction: column;
