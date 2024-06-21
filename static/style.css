@@ -1,12 +1,21 @@
 /* Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+button:hover {
+    background-color: #012368;
+    transform: scale(1.05);
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
 
 /* Navbar Styles */
@@ -29,12 +38,14 @@ nav {
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
 }
 
 nav a {
     color: #fff;
     margin-right: 1rem;
-    font-family: Arial, Helvetica, sans-serif;
     font-size: 28px;
     padding: 10px;
     text-decoration: none;
@@ -109,6 +120,8 @@ h2 {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
+    flex: 1;
+    max-height: calc(100vh - 4rem); /* Adjusting for navbar height */
 }
 
 /* Split Screen Styles */
@@ -153,11 +166,63 @@ button {
     border-radius: 4px;
     cursor: pointer;
     font-size: 1rem;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-button:hover {
-    background-color: #012368;
+/* Chat Container */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    background: #fff;
+    /* margin-top: 4rem; Adjusting for navbar height */
+}
+
+.chat-header {
+    background: #333;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+
+.chat-window {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.chat-input {
+    display: flex;
+    padding: 1rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.chat-input input[type="text"] {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-right: 1rem;
+    font-size: 1rem;
+}
+
+.chat-input button {
+    padding: 0.75rem 1.5rem;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.chat-input button:hover {
+    background-color: #555;
+    transform: scale(1.05);
 }
 
 /* Responsive Design */

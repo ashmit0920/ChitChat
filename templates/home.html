@@ -12,12 +12,18 @@
         <div class="split left">
             <h1>Create a new chatroom</h1>
             <p>Start a new conversation with your friends by creating a chatroom.</p>
-            <button>Create Chatroom</button>
+            <form action="/createroom" method="post">
+                <input type="hidden" name="username" value="{{.Username}}">
+                <button type="submit">Create Chatroom</button>
+            </form>
         </div>
         <div class="split right">
             <h1>Join a chatroom</h1>
             <p>Join an existing chatroom to catch up with ongoing discussions.</p>
-            <button>Join Chatroom</button>
+            <form action="/joinroom" method="post">
+                <input type="text" name="roomCode" placeholder="Enter room code" required>
+                <button type="submit">Join Chatroom</button>
+            </form>
         </div>
     </div>
 </body>

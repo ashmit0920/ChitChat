@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"math/rand"
 	"net/http"
 	"os"
 	"sync"
+	"time"
 )
 
 var (
@@ -15,9 +17,12 @@ var (
 		"templates/login.html",
 		"templates/signup.html",
 		"templates/home.html",
+		"templates/chatroom.html",
 	))
 	users      = make(map[string]string)
 	usersMutex sync.Mutex
+	chatrooms  = make(map[string][]string) // maps chatroom code to messages
+	roomsMutex sync.Mutex
 )
 
 func main() {
@@ -29,6 +34,10 @@ func main() {
 	http.HandleFunc("/auth", authHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/home", homeHandler)
+	http.HandleFunc("/createroom", createRoomHandler)
+	http.HandleFunc("/joinroom", joinRoomHandler)
+	http.HandleFunc("/chatroom", chatRoomHandler)
+	http.HandleFunc("/sendmessage", sendMessageHandler)
 
 	loadUsers()
 
@@ -123,4 +132,83 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "home.html", nil)
+}
+
+func generateRoomCode() string {
+	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	rand.Seed(time.Now().UnixNano())
+	b := make([]byte, 8)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
+func createRoomHandler(w http.ResponseWriter, r *http.Request) {
+	roomCode := generateRoomCode()
+
+	roomsMutex.Lock()
+	chatrooms[roomCode] = []string{}
+	roomsMutex.Unlock()
+
+	username := r.FormValue("username")
+	http.Redirect(w, r, fmt.Sprintf("/chatroom?room=%s&username=%s", roomCode, username), http.StatusSeeOther)
+}
+
+func joinRoomHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		roomCode := r.FormValue("roomCode")
+		roomsMutex.Lock()
+		_, exists := chatrooms[roomCode]
+		roomsMutex.Unlock()
+
+		if exists {
+			http.Redirect(w, r, fmt.Sprintf("/chatroom?room=%s", roomCode), http.StatusSeeOther)
+		} else {
+			http.Redirect(w, r, "/home", http.StatusSeeOther)
+		}
+		return
+	}
+
+	templates.ExecuteTemplate(w, "home.html", nil)
+}
+
+func chatRoomHandler(w http.ResponseWriter, r *http.Request) {
+	roomCode := r.URL.Query().Get("room")
+	if roomCode == "" {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
+
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
+
+	data := struct {
+		RoomCode string
+		Username string
+	}{
+		RoomCode: roomCode,
+		Username: username,
+	}
+	templates.ExecuteTemplate(w, "chatroom.html", data)
+}
+
+func sendMessageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
+
+	roomCode := r.FormValue("roomCode")
+	username := r.FormValue("username")
+	message := r.FormValue("message")
+
+	roomsMutex.Lock()
+	chatrooms[roomCode] = append(chatrooms[roomCode], fmt.Sprintf("%s: %s", username, message))
+	roomsMutex.Unlock()
+
+	http.Redirect(w, r, fmt.Sprintf("/chatroom?room=%s", roomCode), http.StatusSeeOther)
 }
