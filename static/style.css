@@ -180,7 +180,7 @@ button {
 }
 
 .chat-header {
-    background: #333;
+    background: #012368;
     color: #fff;
     padding: 1rem;
     text-align: center;
@@ -211,7 +211,7 @@ button {
 
 .chat-input button {
     padding: 0.75rem 1.5rem;
-    background-color: #333;
+    background-color: #03aac2;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -221,7 +221,7 @@ button {
 }
 
 .chat-input button:hover {
-    background-color: #555;
+    background-color: #012368;
     transform: scale(1.05);
 }
 

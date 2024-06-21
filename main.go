@@ -109,6 +109,13 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Set a cookie with the username
+	http.SetCookie(w, &http.Cookie{
+		Name:  "username",
+		Value: username,
+		Path:  "/",
+	})
+
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
@@ -131,7 +138,19 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	templates.ExecuteTemplate(w, "home.html", nil)
+	cookie, err := r.Cookie("username")
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	username := cookie.Value
+
+	data := struct {
+		Username string
+	}{
+		Username: username,
+	}
+	templates.ExecuteTemplate(w, "home.html", data)
 }
 
 func generateRoomCode() string {
@@ -145,13 +164,19 @@ func generateRoomCode() string {
 }
 
 func createRoomHandler(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("username")
+	if err != nil {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
+	username := cookie.Value
+
 	roomCode := generateRoomCode()
 
 	roomsMutex.Lock()
 	chatrooms[roomCode] = []string{}
 	roomsMutex.Unlock()
 
-	username := r.FormValue("username")
 	http.Redirect(w, r, fmt.Sprintf("/chatroom?room=%s&username=%s", roomCode, username), http.StatusSeeOther)
 }
 
@@ -180,11 +205,12 @@ func chatRoomHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username := r.URL.Query().Get("username")
-	if username == "" {
+	cookie, err := r.Cookie("username")
+	if err != nil {
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
+	username := cookie.Value
 
 	data := struct {
 		RoomCode string
